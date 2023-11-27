@@ -15,6 +15,7 @@
 , linuxHeaders
 , libxcrypt
 , doFakeLibgcc ? stdenv.hostPlatform.isFreeBSD
+, enableInstrumentation ? false
 }:
 
 let
@@ -107,6 +108,8 @@ stdenv.mkDerivation ({
     "-DCOMPILER_RT_ENABLE_IOS=OFF"
   ]) ++ lib.optionals (lib.versionAtLeast version "19" && stdenv.isDarwin && lib.versionOlder stdenv.hostPlatform.darwinMinVersion "10.13") [
     "-DSANITIZER_MIN_OSX_VERSION=10.10"
+  ] ++ lib.optionals enableInstrumentation [
+    "-DLLVM_BUILD_INSTRUMENTED=IR"
   ];
 
   outputs = [ "out" "dev" ];
