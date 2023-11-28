@@ -40,6 +40,7 @@
   && !stdenv.hostPlatform.isAarch
 , enablePolly ? lib.versionAtLeast release_version "14"
 , enableInstrumentation ? false
+, withProfdata ? null
 } @args:
 
 let
@@ -90,6 +91,8 @@ let
 
   patches' = patches ++ lib.optionals enablePolly pollyPatches;
 in
+  assert (lib.assertMsg (enableInstrumentation -> stdenv.cc.isClang) "Instrumentation is only supported when compiling with Clang");
+  assert (lib.assertMsg (withProfdata != null -> stdenv.cc.isClang) "Profiling data is only supported when compiling with Clang");
 
 stdenv.mkDerivation (rec {
   inherit pname version;
@@ -384,6 +387,8 @@ stdenv.mkDerivation (rec {
     )
   ] ++ optionals enableInstrumentation [
     "-DLLVM_BUILD_INSTRUMENTED=IR"
+  ] ++ optionals (withProfdata != null) [
+    "-DLLVM_PROFDATA_FILE=${withProfdata}"
   ];
 
   postInstall = ''
