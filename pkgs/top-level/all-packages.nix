@@ -9509,7 +9509,9 @@ with pkgs;
 
   jmespath = callPackage ../development/tools/jmespath { };
 
-  juicefs = callPackage ../tools/filesystems/juicefs { };
+  juicefs = callPackage ../tools/filesystems/juicefs {
+    buildGoModule = buildGo121Module;
+  };
 
   juicity = callPackage ../tools/networking/juicity { };
 
