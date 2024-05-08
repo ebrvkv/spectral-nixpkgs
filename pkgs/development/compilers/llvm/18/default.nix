@@ -39,6 +39,8 @@
 # to you to make sure that the LLVM repo given matches the release configuration
 # specified.
 , monorepoSrc ? null
+, enableInstrumentation ? false
+, withProfdata ? null
 }:
 
 assert
@@ -134,6 +136,8 @@ in let
         ./llvm/polly-lit-cfg-add-libs-to-dylib-path.patch
       ];
       inherit llvm_meta;
+      inherit enableInstrumentation;
+      inherit withProfdata;
     };
 
     # `llvm` historically had the binaries.  When choosing an output explicitly,
