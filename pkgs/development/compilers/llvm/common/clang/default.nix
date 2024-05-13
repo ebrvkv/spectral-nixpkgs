@@ -52,6 +52,8 @@ let
 
     buildInputs = [ libxml2 libllvm ];
 
+    NIX_CFLAGS_COMPILE = (finalAttrs.NIX_CLAGS_COMPILE or []) ++ lib.optionals enableInstrumentation ["-fprofile-instr-generate"];
+
     cmakeFlags = (lib.optionals (lib.versionAtLeast release_version "15") [
       "-DCLANG_INSTALL_PACKAGE_DIR=${placeholder "dev"}/lib/cmake/clang"
     ]) ++ [

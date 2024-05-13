@@ -387,6 +387,7 @@ stdenv.mkDerivation (rec {
     )
   ] ++ optionals enableInstrumentation [
     "-DLLVM_BUILD_INSTRUMENTED=IR"
+    "-DLLVM_BUILD_RUNTIME=No"
   ] ++ optionals (withProfdata != null) [
     "-DLLVM_PROFDATA_FILE=${withProfdata}"
   ];
