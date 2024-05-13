@@ -113,6 +113,7 @@ stdenv.mkDerivation ({
     "-DSANITIZER_MIN_OSX_VERSION=10.10"
   ] ++ lib.optionals enableInstrumentation [
     "-DLLVM_BUILD_INSTRUMENTED=IR"
+    "-DLLVM_BUILD_RUNTIME=No"
   ] ++ lib.optionals (withProfdata != null) [
     "-DLLVM_PROFDATA_FILE=${withProfdata}"
   ];
