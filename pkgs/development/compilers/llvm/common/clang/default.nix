@@ -76,6 +76,7 @@ let
       "-DCLANG_PSEUDO_GEN=${buildLlvmTools.libclang.dev}/bin/clang-pseudo-gen"
      ] ++ lib.optionals enableInstrumentation [
        "-DLLVM_BUILD_INSTRUMENTED=IR"
+       "-DLLVM_BUILD_RUNTIME=No"
      ] ++ lib.optionals (withProfdata != null) [
        "-DLLVM_PROFDATA_FILE=${withProfdata}"
      ]);
