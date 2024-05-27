@@ -262,7 +262,7 @@ stdenv.mkDerivation (finalAttrs: {
   );
 
   postPatch = ''
-    substituteInPlace src/basic/path-util.h --replace "@defaultPathNormal@" "${placeholder "out"}/bin/"
+    substituteInPlace src/basic/path-util.h --replace "@defaultPathNormal@" "${placeholder "out"}"
   '' + lib.optionalString withLibBPF ''
     substituteInPlace meson.build \
       --replace "find_program('clang'" "find_program('${stdenv.cc.targetPrefix}clang'"
@@ -356,6 +356,13 @@ stdenv.mkDerivation (finalAttrs: {
           { name = "libp11-kit.so.0"; pkg = opt (withHomed || withCryptsetup) p11-kit; }
 
           { name = "libip4tc.so.2"; pkg = opt withIptables iptables; }
+
+          { name = "liblzma.so.5"; pkg = xz; }
+          { name = "liblz4.so.1"; pkg = lz4; }
+          { name = "libzstd.so.1"; pkg = zstd; }
+          { name = "libgcrypt.so.20"; pkg = libgcrypt; }
+          { name = "libarchive.so.13"; pkg = libarchive; }
+          { name = "libkmod.so.2"; pkg = kmod; }
         ];
 
       patchDlOpen = dl:
