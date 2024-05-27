@@ -583,6 +583,10 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.mesonEnable "remote" withRemote)
     (lib.mesonEnable "microhttpd" withRemote)
 
+    (lib.mesonOption "sshconfdir" "no")
+    (lib.mesonOption "sshdconfdir" "no")
+    (lib.mesonOption "sshdconfdir" "no")
+
     (lib.mesonEnable "pam" withPam)
     (lib.mesonEnable "acl" withAcl)
     (lib.mesonEnable "audit" withAudit)
