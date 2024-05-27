@@ -167,6 +167,7 @@
 , docbook_xml_dtd_42
 , docbook_xml_dtd_45
 , withLogTrace ? false
+, libarchive
 }:
 
 assert withImportd -> withCompression;
@@ -357,12 +358,12 @@ stdenv.mkDerivation (finalAttrs: {
 
           { name = "libip4tc.so.2"; pkg = opt withIptables iptables; }
 
-          { name = "liblzma.so.5"; pkg = xz; }
-          { name = "liblz4.so.1"; pkg = lz4; }
-          { name = "libzstd.so.1"; pkg = zstd; }
-          { name = "libgcrypt.so.20"; pkg = libgcrypt; }
+          { name = "liblzma.so.5"; pkg = opt withCompression xz; }
+          { name = "liblz4.so.1"; pkg = opt withCompression lz4; }
+          { name = "libzstd.so.1"; pkg = opt withCompression zstd; }
+          { name = "libgcrypt.so.20"; pkg = opt wantGcrypt libgcrypt; }
           { name = "libarchive.so.13"; pkg = libarchive; }
-          { name = "libkmod.so.2"; pkg = kmod; }
+          { name = "libkmod.so.2"; pkg = opt withKmod kmod; }
         ];
 
       patchDlOpen = dl:
@@ -455,6 +456,7 @@ stdenv.mkDerivation (finalAttrs: {
       libuuid
       linuxHeaders
       bashInteractive # for patch shebangs
+      libarchive
     ]
 
     ++ lib.optionals wantGcrypt [ libgcrypt libgpg-error ]
