@@ -33,7 +33,7 @@ index 5c308a04bc..81aa3d3334 100644
          if (r < 0)
                  return log_error_errno(r, "Failed to parse fallback server strings: %m");
  
-+        r = getenv_bool_secure("SYSTEMD_NSS_RESOLVE_VALIDATE");
++        r = secure_getenv_bool("SYSTEMD_NSS_RESOLVE_VALIDATE");
 +        if (r == 0) {
 +                log_info("Disabling NSCD because DNSSEC validation is turned off");
 +                __nss_disable_nscd(register_traced_file);
