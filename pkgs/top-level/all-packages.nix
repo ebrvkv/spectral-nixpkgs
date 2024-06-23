@@ -39593,7 +39593,7 @@ with pkgs;
     }
   else
     callPackage ../tools/package-management/nix-eval-jobs {
-      nix = nixVersions.nix_2_21;
+      nix = nixVersions.nix_2_20;
     };
 
   nix-doc = callPackage ../tools/package-management/nix-doc { };
