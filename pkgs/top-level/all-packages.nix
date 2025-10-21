@@ -16256,7 +16256,14 @@ with pkgs;
       clang_18
       lld_18
       lldb_18
-      llvm_18;
+      llvm_18
+
+      llvmPackages_20
+      clang_20
+      lld_20
+      lldb_20
+      llvm_20
+      bolt_20;
 
   lorri = callPackage ../tools/misc/lorri {
     inherit (darwin.apple_sdk.frameworks) CoreServices Security;
