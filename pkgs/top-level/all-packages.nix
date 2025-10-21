@@ -16242,12 +16242,29 @@ with pkgs;
       lld_18 = llvmPackages_18.lld;
       lldb_18 = llvmPackages_18.lldb;
       llvm_18 = llvmPackages_18.llvm;
+
+      llvmPackages_20 = recurseIntoAttrs (callPackage ../development/compilers/newllvm/20 ({
+        inherit (stdenvAdapters) overrideCC;
+        buildLlvmTools = buildPackages.llvmPackages_20.tools;
+        targetLlvmLibraries = targetPackages.llvmPackages_20.libraries or llvmPackages_20.libraries;
+        targetLlvm = targetPackages.llvmPackages_20.llvm or llvmPackages_20.llvm;
+      }));
+
+      clang_20 = llvmPackages_20.clang;
+      lld_20 = llvmPackages_20.lld;
+      lldb_20 = llvmPackages_20.lldb;
+      llvm_20 = llvmPackages_20.llvm;
     })
       llvmPackages_18
       clang_18
       lld_18
       lldb_18
-      llvm_18;
+      llvm_18
+      llvmPackages_20
+      clang_20
+      lld_20
+      lldb_20
+      llvm_20;
 
   lorri = callPackage ../tools/misc/lorri {
     inherit (darwin.apple_sdk.frameworks) CoreServices Security;
