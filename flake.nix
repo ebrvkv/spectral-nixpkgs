@@ -3,7 +3,11 @@
 {
   description = "A collection of packages for the Nix package manager";
 
-  outputs = { self }:
+  inputs = {
+    rust-overlay.url = "github:oxalica/rust-overlay";
+  };
+
+  outputs = { self, rust-overlay }:
     let
       libVersionInfoOverlay = import ./lib/flake-version-info.nix self;
       lib = (import ./lib).extend libVersionInfoOverlay;
@@ -87,7 +91,21 @@
       # which keeps `nix flake show` on Nixpkgs reasonably fast, though less
       # information rich.
       legacyPackages = forAllSystems (system:
-        (import ./. { inherit system; }).extend (final: prev: {
+        (import ./. { 
+          inherit system;
+          overlays = [
+          rust-overlay.overlays.default
+          (final: prev:
+            let
+              tc = final.rust-bin.stable."1.85.0".default;
+              rp = prev.makeRustPlatform { rustc = tc; cargo = tc; };
+            in
+            {
+              vector = prev.vector.override { rustPlatform = rp; };
+            }
+          )
+        ];
+        }).extend (final: prev: {
           lib = prev.lib.extend libVersionInfoOverlay;
         })
       );
