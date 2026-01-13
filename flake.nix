@@ -83,6 +83,7 @@
 
       overlays = {
         vector = final: prev: import ./overlays/vector.nix { inherit final prev; };
+        rust = rust-overlay.overlays.default;
       };
 
       # The "legacy" in `legacyPackages` doesn't imply that the packages exposed
