@@ -40,7 +40,8 @@ let
 in
 rustPlatform.buildRustPackage {
   inherit pname version;
-
+  
+  auditable = false;
   src = fetchFromGitHub {
     owner = "vectordotdev";
     repo = pname;
@@ -114,6 +115,24 @@ rustPlatform.buildRustPackage {
   # nor do I know why it depends on rustc.
   # However, in order for the closure size to stay at a reasonable level,
   # transforms-geoip is patched out of Cargo.toml for now - unless explicitly asked for.
+
+  preBuild = ''
+    if [ -f /build/.cargo/config ] && [ ! -e /build/.cargo/config.toml ]; then
+      ln -s /build/.cargo/config /build/.cargo/config.toml
+    fi
+
+    if ! grep -Fq '[source."git+https://github.com/vectordotdev/nix.git?branch=memfd%2Fgnu%2Fmusl"]' /build/.cargo/config; then
+      cat >> /build/.cargo/config <<'EOF'
+
+    [source."git+https://github.com/vectordotdev/nix.git?branch=memfd%2Fgnu%2Fmusl"]
+    git = "https://github.com/vectordotdev/nix.git"
+    branch = "memfd/gnu/musl"
+    replace-with = "vendored-sources"
+
+    EOF
+      fi
+  '';
+
   postPatch = ''
     substituteInPlace ./src/dns.rs \
       --replace "#[tokio::test]" ""
