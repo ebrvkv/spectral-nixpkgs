@@ -36,7 +36,7 @@
 
 let
   pname = "vector";
-  version = "0.39.0";
+  version = "0.49.0";
 in
 rustPlatform.buildRustPackage {
   inherit pname version;
@@ -45,19 +45,20 @@ rustPlatform.buildRustPackage {
     owner = "vectordotdev";
     repo = pname;
     rev = "v${version}";
-    hash = "sha256-S6yzh8ISIh6xzw5DwQaoZdpfmDHE9gfjlEtxIZerSak=";
+    hash = "sha256-sow1BFJgwOOajJ7dTmoUNJ3OpI9/73Uigrcb1CIBOE8=";
   };
 
   cargoLock = {
     lockFile = ./Cargo.lock;
     outputHashes = {
-      "greptime-proto-0.1.0" = "sha256-Q8xr6qN6SAGGK0W96WuNRdQ5/8iNlruqzhXD6xq3Ua8=";
-      "greptimedb-client-0.1.0" = "sha256-evL8Q2Ikct9s0r4DWTgSP/8g4XTishuJHmwRoCfQFbU=";
-      "heim-0.1.0-rc.1" = "sha256-TFgLR5zb/oqceVOH4mIOvFFY/HMOLSo8VI5Eh9KP60E=";
+      "greptime-proto-0.1.0" = "sha256-aeQh/enelNVWwGG7oJYhbwnbZ5MzWNqLzWuU3uDlCI8=";
+      "greptimedb-ingester-0.1.0" = "sha256-XbaVlXKyQXTmh1iOUaxckM32E3xjUvprTiKIhfH5Cts=";
+      "heim-0.1.0-rc.1" = "sha256-tKVOrkMAcoSZLSJXzdukmNzfTDnRjU3NiTyyUxAUvV4=";
       "nix-0.26.2" = "sha256-uquYvRT56lhupkrESpxwKEimRFhmYvri10n3dj0f2yg=";
       "ntapi-0.3.7" = "sha256-G6ZCsa3GWiI/FeGKiK9TWkmTxen7nwpXvm5FtjNtjWU=";
-      "tokio-util-0.7.8" = "sha256-HCvtfohOoa1ZjD4s7QLDbIV4fe/MVBKtgM1QQX7gGKQ=";
+      "tokio-util-0.7.13" = "sha256-Sqj0P0vahL+bsjlP4O6kdQFihxtcGI8n1SXcVJo9gJ0=";
       "tracing-0.2.0" = "sha256-YAxeEofFA43PX2hafh3RY+C81a2v6n1fGzYz2FycC3M=";
+      "vrl-0.26.0" = "sha256-Oj/GO9Sg6J1r/GgNrtDlvGD/ojQPjrVASQ1NQOHqkM8=";
     };
   };
 
