@@ -32,6 +32,7 @@
     ++ lib.optional stdenv.hostPlatform.isUnix "unix")
 , nixosTests
 , nix-update-script
+, auditable ? true
 }:
 
 let
@@ -41,7 +42,7 @@ in
 rustPlatform.buildRustPackage {
   inherit pname version;
   
-  auditable = false;
+  inherit auditable;
   src = fetchFromGitHub {
     owner = "vectordotdev";
     repo = pname;

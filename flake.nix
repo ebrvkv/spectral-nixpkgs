@@ -81,6 +81,10 @@
         }).nixos.manual;
       };
 
+      overlays = {
+        vector = final: prev: import ./overlays/vector.nix { inherit final prev; };
+      };
+
       # The "legacy" in `legacyPackages` doesn't imply that the packages exposed
       # through this attribute are "legacy" packages. Instead, `legacyPackages`
       # is used here as a substitute attribute name for `packages`. The problem
@@ -90,21 +94,14 @@
       # attribute it displays `omitted` instead of evaluating all packages,
       # which keeps `nix flake show` on Nixpkgs reasonably fast, though less
       # information rich.
+
       legacyPackages = forAllSystems (system:
         (import ./. { 
           inherit system;
           overlays = [
-          rust-overlay.overlays.default
-          (final: prev:
-            let
-              tc = final.rust-bin.stable."1.86.0".default;
-              rp = prev.makeRustPlatform { rustc = tc; cargo = tc; };
-            in
-            {
-              vector = prev.vector.override { rustPlatform = rp; };
-            }
-          )
-        ];
+            rust-overlay.overlays.default
+            self.overlays.vector
+          ];
         }).extend (final: prev: {
           lib = prev.lib.extend libVersionInfoOverlay;
         })
@@ -126,5 +123,6 @@
         */
         readOnlyPkgs = ./nixos/modules/misc/nixpkgs/read-only.nix;
       };
+
     };
 }
