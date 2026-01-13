@@ -4,7 +4,6 @@ let
   rp = final.makeRustPlatform { rustc = tc; cargo = tc; };
 in
 {
-  vrl = prev.vrl.override { rustPlatform = rp; };
   vector = prev.vector.override {
     rustPlatform = rp;
     auditable = false;
