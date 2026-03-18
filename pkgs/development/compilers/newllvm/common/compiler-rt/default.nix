@@ -30,6 +30,9 @@
   devExtraCmakeFlags ? [ ],
   getVersionFile,
   fetchpatch,
+  # Compatibility with older llvm/common/compiler-rt API; unused in newllvm
+  enableInstrumentation ? false,
+  withProfdata ? null,
 }:
 
 let

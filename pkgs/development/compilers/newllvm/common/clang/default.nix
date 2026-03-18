@@ -17,6 +17,9 @@
   enableManpages ? false,
   enableClangToolsExtra ? true,
   devExtraCmakeFlags ? [ ],
+  # Compatibility with older llvm/common/clang API; unused in newllvm
+  enableInstrumentation ? false,
+  withProfdata ? null,
   replaceVars,
   getVersionFile,
   fetchpatch,

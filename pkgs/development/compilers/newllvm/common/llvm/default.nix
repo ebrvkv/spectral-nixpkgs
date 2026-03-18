@@ -12,7 +12,7 @@
   python3,
   python3Packages,
   libffi,
-  ld64,
+  ld64 ? null, # macOS-only (Apple linker), not available on Linux
   libbfd,
   libpfm,
   libxml2,
@@ -38,6 +38,7 @@
   fetchpatch,
   # for tests
   libllvm,
+  withProfdata ? null
 }:
 
 let

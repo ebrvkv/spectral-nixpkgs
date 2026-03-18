@@ -1338,6 +1338,10 @@ with pkgs;
 
   substituteAll = callPackage ../build-support/substitute/substitute-all.nix { };
 
+  # Like substituteAll, but takes the file as the first argument and replacements as the second.
+  # Added for compatibility with newer nixpkgs (newllvm package set requires this).
+  replaceVars = src: replacements: pkgs.substituteAll ({ inherit src; } // replacements);
+
   substituteAllFiles = callPackage ../build-support/substitute-files/substitute-all-files.nix { };
 
   replaceDependency = callPackage ../build-support/replace-dependency.nix { };
@@ -16244,6 +16248,12 @@ with pkgs;
       llvm_18 = llvmPackages_18.llvm;
 
       llvmPackagesSet = recurseIntoAttrs (callPackages ../development/compilers/newllvm { });
+      llvmPackages_19 = llvmPackagesSet."19";
+      clang_19 = llvmPackages_19.clang;
+      lld_19 = llvmPackages_19.lld;
+      lldb_19 = llvmPackages_19.lldb;
+      llvm_19 = llvmPackages_19.llvm;
+
       llvmPackages_20 = llvmPackagesSet."20";
       clang_20 = llvmPackages_20.clang;
       lld_20 = llvmPackages_20.lld;
@@ -16257,6 +16267,12 @@ with pkgs;
       lld_18
       lldb_18
       llvm_18
+
+      llvmPackages_19
+      clang_19
+      lld_19
+      lldb_19
+      llvm_19
 
       llvmPackages_20
       clang_20
@@ -20625,7 +20641,7 @@ with pkgs;
 
   flyway = callPackage ../development/tools/flyway { };
 
-  inherit (callPackages ../development/libraries/fmt { }) fmt_8 fmt_9 fmt_10;
+  inherit (callPackages ../development/libraries/fmt { }) fmt_8 fmt_9 fmt_10 fmt_11 fmt_12;
 
   fmt = fmt_10;
 

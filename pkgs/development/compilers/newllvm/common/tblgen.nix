@@ -103,7 +103,7 @@ let
     ]
     ++ devExtraCmakeFlags;
 
-    ninjaFlags = targets;
+    ninjaFlagsArray = targets;
 
     inherit targets;
 

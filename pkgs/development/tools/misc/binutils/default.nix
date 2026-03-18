@@ -14,6 +14,7 @@ in
 , lib
 , noSysDirs
 , perl
+, runCommand
 , substitute
 , zlib
 
@@ -264,6 +265,14 @@ stdenv.mkDerivation (finalAttrs: {
     # (around PLUGINS) for cases that support or not support plugins.
     # No platform specific filters yet here.
     hasPluginAPI = enableGold;
+    plugin-api-header = runCommand "libbfd-plugin-api-header" { } ''
+      mkdir -p $out
+      tar --directory=$out \
+      --extract \
+      --file=${finalAttrs.src} \
+      --strip-components=1 \
+        --wildcards '*'/include/plugin-api.h
+    '';
   };
 
   meta = with lib; {
