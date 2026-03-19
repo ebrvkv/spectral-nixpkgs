@@ -3,7 +3,7 @@
   targetPackages,
   lib,
   stdenv,
-  preLibcHeaders,
+  preLibcCrossHeaders,
   fetchFromGitHub,
   overrideCC,
   wrapCCWith,
@@ -279,7 +279,7 @@ makeScopeWithSplicing' {
 
       bintoolsNoLibc = wrapBintoolsWith {
         bintools = self.bintools-unwrapped;
-        libc = targetPackages.preLibcHeaders or preLibcHeaders;
+        libc = targetPackages.preLibcCrossHeaders or preLibcCrossHeaders;
       };
 
       bintools = wrapBintoolsWith {

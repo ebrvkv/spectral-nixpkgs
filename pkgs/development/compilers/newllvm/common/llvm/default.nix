@@ -12,7 +12,7 @@
   python3,
   python3Packages,
   libffi,
-  ld64,
+  ld64 ? null,
   libbfd,
   libpfm,
   libxml2,
