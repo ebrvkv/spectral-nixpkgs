@@ -16284,19 +16284,17 @@ with pkgs;
       lld_18
       lldb_18
       llvm_18
-
       llvmPackages_19
       clang_19
       lld_19
       lldb_19
       llvm_19
-
       llvmPackages_20
       clang_20
       lld_20
       lldb_20
       llvm_20
-      bolt_20;
+      bolt_20
       llvmPackages_21
       clang_21
       lld_21
@@ -16312,6 +16310,7 @@ with pkgs;
       bolt_22
       flang_22
       mkLLVMPackages
+      ;
       
 
   lorri = callPackage ../tools/misc/lorri {
