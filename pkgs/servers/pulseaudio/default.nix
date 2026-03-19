@@ -138,7 +138,8 @@ stdenv.mkDerivation rec {
   ];
 
   # tests fail on Darwin because of timeouts
-  doCheck = !stdenv.isDarwin;
+  # libOnly builds fail tests in headless CI (no audio devices / running daemon)
+  doCheck = !stdenv.isDarwin && !libOnly;
   preCheck = ''
     export HOME=$(mktemp -d)
   '';
