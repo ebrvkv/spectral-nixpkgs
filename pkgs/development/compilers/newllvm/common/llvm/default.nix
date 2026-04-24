@@ -114,10 +114,7 @@ stdenv.mkDerivation (
       "python"
     ];
 
-    hardeningDisable = [
-      "trivialautovarinit"
-      "shadowstack"
-    ];
+    hardeningDisable = [ "trivialautovarinit" ];
 
     patches =
       # Support custom installation dirs
@@ -471,12 +468,7 @@ stdenv.mkDerivation (
         (lib.cmakeBool "SPHINX_WARNINGS_AS_ERRORS" false)
       ]
       ++ optionals (libbfd != null) [
-        # LLVM depends on binutils only through libbfd/include/plugin-api.h, which
-        # is meant to be a stable interface. Depend on that file directly rather
-        # than through a build of BFD to break the dependency of clang on the target
-        # triple. The result of this is that a single clang build can be used for
-        # multiple targets.
-        (lib.cmakeFeature "LLVM_BINUTILS_INCDIR" "${libbfd.plugin-api-header}/include")
+        (lib.cmakeFeature "LLVM_BINUTILS_INCDIR" "${libbfd.dev}/include")
       ]
       ++ optionals stdenv.hostPlatform.isDarwin [
         (lib.cmakeBool "LLVM_ENABLE_LIBCXX" true)

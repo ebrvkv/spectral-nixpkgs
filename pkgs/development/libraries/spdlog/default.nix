@@ -13,13 +13,13 @@
 
 stdenv.mkDerivation rec {
   pname = "spdlog";
-  version = "1.17.0";
+  version = "1.13.0";
 
   src = fetchFromGitHub {
     owner = "gabime";
     repo  = "spdlog";
     rev   = "v${version}";
-    hash  = "sha256-bL3hQmERXNwGmDoi7+wLv/TkppGhG6cO47k1iZvJGzY=";
+    hash  = "sha256-3n8BnjZ7uMH8quoiT60yTU7poyOtoEmzNMOLa1+r7X0=";
   };
 
   nativeBuildInputs = [ cmake ];

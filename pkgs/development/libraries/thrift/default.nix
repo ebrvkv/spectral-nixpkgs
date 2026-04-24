@@ -117,7 +117,7 @@ stdenv.mkDerivation rec {
     "StressTestNonBlocking"
   ];
 
-  doCheck = false;
+  doCheck = !static;
 
   checkPhase = ''
     runHook preCheck

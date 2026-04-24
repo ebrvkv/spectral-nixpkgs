@@ -16,7 +16,7 @@
 , libffi
   # TODO: Can this memory corruption bug still occur?
   # <https://github.com/llvm/llvm-project/issues/61350>
-# , enableGoldPlugin ? libbfd.hasPluginAPI
+, enableGoldPlugin ? libbfd.hasPluginAPI
 , libbfd
 , libpfm
 , libxml2
@@ -364,6 +364,8 @@ stdenv.mkDerivation (rec {
     "-DSPHINX_OUTPUT_MAN=ON"
     "-DSPHINX_OUTPUT_HTML=OFF"
     "-DSPHINX_WARNINGS_AS_ERRORS=OFF"
+  ] ++ optionals (enableGoldPlugin) [
+    "-DLLVM_BINUTILS_INCDIR=${libbfd.dev}/include"
   ] ++ optionals isDarwin [
     "-DLLVM_ENABLE_LIBCXX=ON"
     "-DCAN_TARGET_i386=false"
