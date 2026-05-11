@@ -1338,6 +1338,10 @@ with pkgs;
 
   substituteAll = callPackage ../build-support/substitute/substitute-all.nix { };
 
+  # Like substituteAll, but takes the file as the first argument and replacements as the second.
+  # Added for compatibility with newer nixpkgs (newllvm package set requires this).
+  replaceVars = src: replacements: pkgs.substituteAll ({ inherit src; } // replacements);
+
   substituteAllFiles = callPackage ../build-support/substitute-files/substitute-all-files.nix { };
 
   replaceDependency = callPackage ../build-support/replace-dependency.nix { };
@@ -15456,7 +15460,7 @@ with pkgs;
   };
 
   inherit (callPackage ../development/compilers/gcc/all.nix { inherit noSysDirs; })
-    gcc48 gcc49 gcc6 gcc7 gcc8 gcc9 gcc10 gcc11 gcc12 gcc13 gcc14;
+    gcc48 gcc49 gcc6 gcc7 gcc8 gcc9 gcc10 gcc11 gcc12 gcc13 gcc14 gcc15;
 
   gcc_latest = gcc14;
 
@@ -16244,6 +16248,12 @@ with pkgs;
       llvm_18 = llvmPackages_18.llvm;
 
       llvmPackagesSet = recurseIntoAttrs (callPackages ../development/compilers/newllvm { });
+      llvmPackages_19 = llvmPackagesSet."19";
+      clang_19 = llvmPackages_19.clang;
+      lld_19 = llvmPackages_19.lld;
+      lldb_19 = llvmPackages_19.lldb;
+      llvm_19 = llvmPackages_19.llvm;
+
       llvmPackages_20 = llvmPackagesSet."20";
       clang_20 = llvmPackages_20.clang;
       lld_20 = llvmPackages_20.lld;
@@ -16251,19 +16261,57 @@ with pkgs;
       llvm_20 = llvmPackages_20.llvm;
       bolt_20 = llvmPackages_20.bolt;
 
+      llvmPackages_21 = llvmPackagesSet."21";
+      clang_21 = llvmPackages_21.clang;
+      lld_21 = llvmPackages_21.lld;
+      lldb_21 = llvmPackages_21.lldb;
+      llvm_21 = llvmPackages_21.llvm;
+      bolt_21 = llvmPackages_21.bolt;
+      flang_21 = llvmPackages_21.flang;
+
+      llvmPackages_22 = llvmPackagesSet."22";
+      clang_22 = llvmPackages_22.clang;
+      lld_22 = llvmPackages_22.lld;
+      lldb_22 = llvmPackages_22.lldb;
+      llvm_22 = llvmPackages_22.llvm;
+      bolt_22 = llvmPackages_22.bolt;
+      flang_22 = llvmPackages_22.flang;
+
+      mkLLVMPackages = llvmPackagesSet.mkPackage;
     })
       llvmPackages_18
       clang_18
       lld_18
       lldb_18
       llvm_18
-
+      llvmPackages_19
+      clang_19
+      lld_19
+      lldb_19
+      llvm_19
       llvmPackages_20
       clang_20
       lld_20
       lldb_20
       llvm_20
-      bolt_20;
+      bolt_20
+      llvmPackages_21
+      clang_21
+      lld_21
+      lldb_21
+      llvm_21
+      bolt_21
+      flang_21
+      llvmPackages_22
+      clang_22
+      lld_22
+      lldb_22
+      llvm_22
+      bolt_22
+      flang_22
+      mkLLVMPackages
+      ;
+      
 
   lorri = callPackage ../tools/misc/lorri {
     inherit (darwin.apple_sdk.frameworks) CoreServices Security;
@@ -20625,7 +20673,7 @@ with pkgs;
 
   flyway = callPackage ../development/tools/flyway { };
 
-  inherit (callPackages ../development/libraries/fmt { }) fmt_8 fmt_9 fmt_10;
+  inherit (callPackages ../development/libraries/fmt { }) fmt_8 fmt_9 fmt_10 fmt_11 fmt_12;
 
   fmt = fmt_10;
 

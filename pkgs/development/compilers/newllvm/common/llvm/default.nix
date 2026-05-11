@@ -12,7 +12,7 @@
   python3,
   python3Packages,
   libffi,
-  ld64,
+  ld64 ? null,
   libbfd,
   libpfm,
   libxml2,
@@ -22,7 +22,7 @@
   zlib,
   which,
   sysctl,
-  buildLlvmTools,
+  buildLlvmPackages,
   updateAutotoolsGnuConfigScriptsHook,
   enableManpages ? false,
   enableSharedLibraries ? !stdenv.hostPlatform.isStatic,
@@ -114,10 +114,7 @@ stdenv.mkDerivation (
       "python"
     ];
 
-    hardeningDisable = [
-      "trivialautovarinit"
-      "shadowstack"
-    ];
+    hardeningDisable = [ "trivialautovarinit" ];
 
     patches =
       # Support custom installation dirs
@@ -193,6 +190,10 @@ stdenv.mkDerivation (
           stripLen = 1;
           hash = "sha256-fqw5gTSEOGs3kAguR4tINFG7Xja1RAje+q67HJt2nGg=";
         })
+        # Fix build with gcc15
+        # https://github.com/llvm/llvm-project/commit/8f39502b85d34998752193e85f36c408d3c99248
+        # https://github.com/llvm/llvm-project/commit/7abf44069aec61eee147ca67a6333fc34583b524
+        ./llvm-add-include-cstdint.patch
       ]
       ++ lib.optionals (lib.versionOlder release_version "19") [
         # Fixes test-suite on glibc 2.40 (https://github.com/llvm/llvm-project/pull/100804)
@@ -289,60 +290,27 @@ stdenv.mkDerivation (
           ''
         +
           # fails when run in sandbox
-          optionalString (!stdenv.hostPlatform.isx86) ''
+          ''
             substituteInPlace unittests/Support/VirtualFileSystemTest.cpp \
               --replace-fail "PhysicalFileSystemWorkingDirFailure" "DISABLED_PhysicalFileSystemWorkingDirFailure"
           ''
+        +
+          # Fails on macOS ≥ 26 due to the changed OS version scheme.
+          #
+          # This was fixed upstream in LLVM 21 with
+          # 88f041f3e05e26617856cc096d2e2864dfaa1c7b, but it’s too
+          # painful to backport all the way.
+          lib.optionalString (lib.versionOlder release_version "21") ''
+            substituteInPlace unittests/TargetParser/Host.cpp \
+              --replace-fail "getMacOSHostVersion" "DISABLED_getMacOSHostVersion"
+          ''
+        +
+          # This test fails with a `dysmutil` crash; have not yet dug into what's
+          # going on here (TODO(@rrbutani)).
+          lib.optionalString (stdenv.hostPlatform.isx86 && lib.versionOlder release_version "19") ''
+            rm test/tools/dsymutil/ARM/obfuscated.test
+          ''
       )
-      +
-        # dup of above patch with different conditions
-        optionalString (stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isx86)
-          # fails when run in sandbox
-          (
-            ''
-              substituteInPlace unittests/Support/VirtualFileSystemTest.cpp \
-                --replace-fail "PhysicalFileSystemWorkingDirFailure" "DISABLED_PhysicalFileSystemWorkingDirFailure"
-            ''
-            +
-              # This test fails on darwin x86_64 because `sw_vers` reports a different
-              # macOS version than what LLVM finds by reading
-              # `/System/Library/CoreServices/SystemVersion.plist` (which is passed into
-              # the sandbox on macOS).
-              #
-              # The `sw_vers` provided by nixpkgs reports the macOS version associated
-              # with the `CoreFoundation` framework with which it was built. Because
-              # nixpkgs pins the SDK for `aarch64-darwin` and `x86_64-darwin` what
-              # `sw_vers` reports is not guaranteed to match the macOS version of the host
-              # that's building this derivation.
-              #
-              # Astute readers will note that we only _patch_ this test on aarch64-darwin
-              # (to use the nixpkgs provided `sw_vers`) instead of disabling it outright.
-              # So why does this test pass on aarch64?
-              #
-              # Well, it seems that `sw_vers` on aarch64 actually links against the _host_
-              # CoreFoundation framework instead of the nixpkgs provided one.
-              #
-              # Not entirely sure what the right fix is here. I'm assuming aarch64
-              # `sw_vers` doesn't intentionally link against the host `CoreFoundation`
-              # (still digging into how this ends up happening, will follow up) but that
-              # aside I think the more pertinent question is: should we be patching LLVM's
-              # macOS version detection logic to use `sw_vers` instead of reading host
-              # paths? This *is* a way in which details about builder machines can creep
-              # into the artifacts that are produced, affecting reproducibility, but it's
-              # not clear to me when/where/for what this even gets used in LLVM.
-              #
-              # TODO(@rrbutani): fix/follow-up
-              ''
-                substituteInPlace unittests/TargetParser/Host.cpp \
-                  --replace-fail "getMacOSHostVersion" "DISABLED_getMacOSHostVersion"
-              ''
-            +
-              # This test fails with a `dysmutil` crash; have not yet dug into what's
-              # going on here (TODO(@rrbutani)).
-              lib.optionalString (lib.versionOlder release_version "19") ''
-                rm test/tools/dsymutil/ARM/obfuscated.test
-              ''
-          )
 
       +
         # FileSystem permissions tests fail with various special bits
@@ -449,9 +417,9 @@ stdenv.mkDerivation (
       '';
 
     # E.g. Mesa uses the build-id as a cache key (see #93946):
-    LDFLAGS = optionalString (
-      enableSharedLibraries && !stdenv.hostPlatform.isDarwin
-    ) "-Wl,--build-id=sha1";
+    env = lib.optionalAttrs (enableSharedLibraries && !stdenv.hostPlatform.isDarwin) {
+      LDFLAGS = "-Wl,--build-id=sha1";
+    };
 
     cmakeBuildType = "Release";
 
@@ -468,7 +436,7 @@ stdenv.mkDerivation (
           (lib.cmakeFeature "LLVM_INSTALL_PACKAGE_DIR" "${placeholder "dev"}/lib/cmake/llvm")
           (lib.cmakeBool "LLVM_ENABLE_RTTI" true)
           (lib.cmakeBool "LLVM_LINK_LLVM_DYLIB" enableSharedLibraries)
-          (lib.cmakeFeature "LLVM_TABLEGEN" "${buildLlvmTools.tblgen}/bin/llvm-tblgen")
+          (lib.cmakeFeature "LLVM_TABLEGEN" "${buildLlvmPackages.tblgen}/bin/llvm-tblgen")
         ];
       in
       flagsForLlvmConfig
@@ -500,12 +468,7 @@ stdenv.mkDerivation (
         (lib.cmakeBool "SPHINX_WARNINGS_AS_ERRORS" false)
       ]
       ++ optionals (libbfd != null) [
-        # LLVM depends on binutils only through libbfd/include/plugin-api.h, which
-        # is meant to be a stable interface. Depend on that file directly rather
-        # than through a build of BFD to break the dependency of clang on the target
-        # triple. The result of this is that a single clang build can be used for
-        # multiple targets.
-        (lib.cmakeFeature "LLVM_BINUTILS_INCDIR" "${libbfd.plugin-api-header}/include")
+        (lib.cmakeFeature "LLVM_BINUTILS_INCDIR" "${libbfd.dev}/include")
       ]
       ++ optionals stdenv.hostPlatform.isDarwin [
         (lib.cmakeBool "LLVM_ENABLE_LIBCXX" true)
@@ -616,6 +579,10 @@ stdenv.mkDerivation (
         widely used in academic research. Code in the LLVM project is licensed
         under the "Apache 2.0 License with LLVM exceptions".
       '';
+      identifiers.cpeParts = llvm_meta.identifiers.cpeParts // {
+        inherit version;
+        update = "*";
+      };
     };
   }
   // lib.optionalAttrs enableManpages {

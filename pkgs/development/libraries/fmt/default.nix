@@ -70,4 +70,12 @@ in
     version = "10.2.1";
     sha256 = "sha256-pEltGLAHLZ3xypD/Ur4dWPWJ9BGVXwqQyKcDWVmC3co=";
   };
+  fmt_11 = generic {
+    version = "11.2.0";
+    sha256 = "sha256-sAlU5L/olxQUYcv8euVYWTTB8TrVeQgXLHtXy8IMEnU=";
+  };
+  fmt_12 = generic {
+    version = "12.1.0";
+    sha256 = "sha256-ZmI1Dv0ZabPlxa02OpERI47jp7zFfjpeWCy1WyuPYZ0=";
+  };
 }

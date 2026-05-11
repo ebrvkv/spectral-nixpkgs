@@ -25,6 +25,7 @@
 }:
 
 let
+  atLeast15 = lib.versionAtLeast version "15";
   atLeast14 = lib.versionAtLeast version "14";
   atLeast13 = lib.versionAtLeast version "13";
   atLeast12 = lib.versionAtLeast version "12";
@@ -35,6 +36,7 @@ let
   atLeast7  = lib.versionAtLeast version  "7";
   atLeast6  = lib.versionAtLeast version  "6";
   atLeast49 = lib.versionAtLeast version  "4.9";
+  is15 = majorVersion == "15";
   is14 = majorVersion == "14";
   is13 = majorVersion == "13";
   is12 = majorVersion == "12";
@@ -65,6 +67,7 @@ in
 ++ optionals (noSysDirs) (
   [(if atLeast12 then ./gcc-12-no-sys-dirs.patch else ./no-sys-dirs.patch)] ++
   ({
+    "15" = [ ./13/no-sys-dirs-riscv.patch ./13/mangle-NIX_STORE-in-__FILE__.patch ];
     "14" = [ ./13/no-sys-dirs-riscv.patch ./13/mangle-NIX_STORE-in-__FILE__.patch ];
     "13" = [ ./13/no-sys-dirs-riscv.patch ./13/mangle-NIX_STORE-in-__FILE__.patch ];
     "12" = [ ./no-sys-dirs-riscv.patch ./12/mangle-NIX_STORE-in-__FILE__.patch ];
@@ -78,6 +81,14 @@ in
 ++ optional atLeast7 ./ppc-musl.patch
 ++ optional is12 ./12/lambda-ICE-PR109241.patch # backport ICE fix on ccache code
 ++ optional (atLeast9 && langD) ./libphobos.patch
+ # Needed to build GCC 15 with newer clang during bootstrap.
+++ optional is15 ./cfi_startproc-reorder-label-14-1.diff
+ # c++tools: Don't check --enable-default-pie. --enable-default-pie breaks
+ # bootstrap GCC because libiberty.a is not found.
+++ optional is15 ./c++tools-dont-check-enable-default-pie.patch
+ # http://gcc.gnu.org/PR120718 backport (will be included in 15.3.0) to
+ # fix aarch64-linux ICEs.
+++ optional is15 ./15/aarch64-sve-rtx.patch
 
 
 
@@ -128,6 +139,10 @@ in
 
 # Fixes detection of Darwin on x86_64-darwin. Otherwise, GCC uses a deployment target of 10.5, which crashes ld64.
 ++ optional (atLeast14 && stdenv.isDarwin && stdenv.isx86_64) ../patches/14/libgcc-darwin-detection.patch
+++ optional (atLeast15 && stdenv.isDarwin) ../patches/15/libgcc-darwin-detection.patch
+
+# Fix libgcc_s.1.dylib build on Darwin 11+ by not reexporting unwind symbols that don't exist.
+++ optional (atLeast15 && stdenv.isDarwin) ../patches/15/libgcc-darwin-fix-reexport.patch
 
 # Fix detection of bootstrap compiler Ada support (cctools as) on Nix Darwin
 ++ optional (atLeast12 && stdenv.isDarwin && langAda) ./ada-cctools-as-detection-configure.patch
@@ -137,6 +152,7 @@ in
 
 # Use absolute path in GNAT dylib install names on Darwin
 ++ optionals (stdenv.isDarwin && langAda) ({
+  "15" = [ ../patches/14/gnat-darwin-dylib-install-name-14.patch ];
   "14" = [ ../patches/14/gnat-darwin-dylib-install-name-14.patch ];
   "13" = [ ./gnat-darwin-dylib-install-name-13.patch ];
   "12" = [ ./gnat-darwin-dylib-install-name.patch ];
@@ -145,6 +161,11 @@ in
 # We only apply this patch when building a native toolchain for aarch64-darwin, as it breaks building
 # a foreign one: https://github.com/iains/gcc-12-branch/issues/18
 ++ optionals (stdenv.isDarwin && stdenv.isAarch64 && buildPlatform == hostPlatform && hostPlatform == targetPlatform) ({
+  "15" = [ (fetchpatch {
+    name = "gcc-15-darwin-aarch64-support.patch";
+    url = "https://raw.githubusercontent.com/Homebrew/formula-patches/a25079204c1cb3d78ba9dd7dd22b8aecce7ce264/gcc/gcc-15.1.0.diff";
+    sha256 = "sha256-MJxSGv6LEP1sIM8cDqbmfUV7byV0bYgADeIBY/Teyu8=";
+  }) ];
   "14" = [ (fetchpatch {
     name = "gcc-14-darwin-aarch64-support.patch";
     url = "https://raw.githubusercontent.com/Homebrew/formula-patches/82b5c1cd38826ab67ac7fc498a8fe74376a40f4a/gcc/gcc-14.1.0.diff";

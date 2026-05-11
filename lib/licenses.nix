@@ -134,6 +134,12 @@ in mkLicense lset) ({
     fullName = "Apache License 2.0 with LLVM Exceptions";
   };
 
+  llvm-exception = {
+    spdxId = "LLVM-exception";
+    fullName = "LLVM Exception";
+    url = "https://foundation.llvm.org/relicensing/LICENSE.txt";
+  };
+
   bitstreamVera = {
     spdxId = "Bitstream-Vera";
     fullName = "Bitstream Vera Font License";
